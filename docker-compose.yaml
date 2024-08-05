@@ -1,0 +1,75 @@
+# docker-compose down --remove-orphans -v && docker-compose up --build -d
+services:
+
+    zk-initiator:
+        stdin_open: true
+        tty: true
+        container_name: zk-initiator
+        hostname: zk-initiator
+        build:
+            context: .
+            dockerfile: initiator.dockerfile
+        ports:
+            - 8001:8001
+        volumes:
+            - './app-init/app/data:/app/data'
+        image: zk-demo-initiator
+        networks:
+            zk:
+                ipv4_address: 172.30.0.101
+
+    zk-client:
+        stdin_open: true
+        tty: true
+        container_name: zk-client
+        hostname: zk-client
+        build:
+            context: .
+            dockerfile: client.dockerfile
+        ports:
+            - 3000:3000
+        image: zk-demo-client
+        depends_on: { zk-initiator: { condition: 'service_healthy' } }
+        environment:
+            - NEXT_TELEMETRY_DISABLED=1
+        networks:
+            zk:
+                ipv4_address: 172.30.0.102
+
+    zk-company:
+        stdin_open: true
+        tty: true
+        container_name: zk-company
+        hostname: zk-company
+        build:
+            context: .
+            dockerfile: company.dockerfile
+        ports:
+            - 3001:3001
+        volumes:
+            - './settings/cal_data.json:/app/settings/cal_data.json'
+            - './srs/kzg.srs:/app/srs/kzg.srs'
+            - './models/network_good.ezkl:/app/models/network_good.ezkl'
+            - './models/network_good.onnx:/app/models/network_good.onnx'
+            - './models/network_bad.ezkl:/app/models/network_bad.ezkl'
+            - './models/network_bad.onnx:/app/models/network_bad.onnx'
+            - './settings/settings_good.json:/app/settings/settings_good.json'
+            - './settings/settings_bad.json:/app/settings/settings_bad.json'
+            - './prepare-zk-company.sh:/app/prepare-zk-company.sh'
+        image: zk-demo-company
+        depends_on: { zk-initiator: { condition: 'service_healthy' } }
+        entrypoint:
+            - /bin/sh
+        command: -c ./prepare-zk-company.sh
+        environment:
+            - NEXT_TELEMETRY_DISABLED=1
+        networks:
+            zk:
+                ipv4_address: 172.30.0.103
+
+networks:
+    zk:
+        ipam:
+            config: [ { subnet: '172.30.0.0/24' } ]
+
+# watch -ct docker-compose logs zk-initiator zk-client zk-company --tail 10
