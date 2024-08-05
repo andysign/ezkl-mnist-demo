@@ -105,4 +105,115 @@ Last, but not least, to stop and remove all containers, run **`docker-compose do
 
 ---
 
+## ZKML MNIST Local Demo: System Architecture Diagram
+
+To get a good understanding at first glance, as much as possible, please see the high-level diagram.
+
+The advanced demo of the EZKL zk-ml library which includes the _modeller_, the _initialisation_ or _initiator_, the  _prover_ and, last but not least, the  _verifier_.
+
+Diagram:
+
+```
+┌───────────────────────────────────────┐    ┌──────────────┐
+│                                       │    │              │
+│ Modeller  (zk-modeller)  Port_8888    │ ─► │ Shared       │
+│                                       │    │              │
+│ ┌───────────────────────────────────┐ │ ◄─ │ folder /     │
+│ │                                   │ │    │              │
+│ │ JupyterNotebook                   │ │    │ volume       │
+│ │                                   │ │    │              │
+│ │                                   │ │    │ hostMachine  │
+│ │                                   │ │    │              │
+│ │                                   │ │    │ ./data-ml/   │
+│ │                                   │ │    │              │
+│ │                                   │ │    │              │
+│ │                                   │ │    │              │
+│ └───────────────────────────────────┘ │    │              │
+│                                       │    │              │
+└───────────────────────────────────────┘    └──────────────┘
+
+ │  ▲
+ │  │
+ ▼  │
+
+┌───────────────────────────────────────┐    ┌──────────────┐
+│                                       │    │              │
+│ Initiator                             │ ─► │ Shared       │
+│                                       │    │              │
+│ EZKL Cli or Py Lib                    │ ◄─ │ folder /     │
+│                                       │    │              │
+│                                       │    │ volume       │
+│                                       │    │              │
+│                                       │    │              │
+│                                       │    │              │
+│                                       │    │              │
+│                                       │    │              │
+│                                       │    │              │
+│                                       │    │              │
+└───────────────────────────────────────┘    └──────────────┘
+
+ │  ▲
+ │  │
+ ▼  │
+
+┌───────────────────────────────────────┐    ┌──────────────┐    ┌──────────────────────────────┐
+│                                       │    │              │    │                              │
+│ Prover                                │ ─► │ Shared       │ ─► │ UI                           │
+│                                       │    │              │    │                              │
+│ EZKL Cli or Py Lib                    │ ◄─ │ folder /     │ ◄─ │ Nginx OR ExpressJS           │
+│                                       │    │              │    │                              │
+│                                       │    │ volume       │    │ Serving React / Static HTML  │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+└───────────────────────────────────────┘    └──────────────┘    │                              │
+                                                                 │                              │
+ │  ▲                  │                                ◄─────   │                              │
+ │  │                  └───────►    ┌──────────►                 │                              │
+ ▼  │                               │                   ◄─────   │                              │
+                                                                 │                              │
+┌───────────────────────────────────────┐    ┌──────────────┐    │                              │
+│                                       │    │              │    │                              │
+│ Verifier                              │ ─► │ Shared       │ ─► │                              │
+│                                       │    │              │    │                              │
+│ EZKL Cli or Py Lib                    │ ◄─ │ folder /     │ ◄─ │                              │
+│                                       │    │              │    │                              │
+│                                       │    │ volume       │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+│                                       │    │              │    │                              │
+└───────────────────────────────────────┘    └──────────────┘    └──────────────────────────────┘
+```
+
+Folder Structure
+
+```
+├── data-ml/
+├── data-ml-zk-init/
+├── data-ml-zk-prover/
+├── data-ml-zk-verifier/
+├── src/
+└── README.md
+```
+
+---
+
+Added System Arch Diagram.
+
+This has been made using.
+
+**[https://asciiflow.com/](https://asciiflow.com/)**
+
+If needed this could be made into a simple SVG diagram with Figma.
+
+---
+
 ---
